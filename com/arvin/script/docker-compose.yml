@@ -1,0 +1,6 @@
+services:
+  yarn_metrics:
+    image: "chenshaojin/wx_robot:v1"
+    restart: always
+    volumes:
+      - "/xx/xx/xxx:/conf"

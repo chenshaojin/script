@@ -14,14 +14,21 @@ import time
 import requests
 
 # 测试机器人1号,将此网址替换成你的群聊机器人Webhook地址
-wx_url = "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xxxxxxx"
-wx_info_path = "wx_user"
+wx_url = "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key="
+wx_info_path = "./conf/wx_user"
+wx_robot_token = "./conf/token"
 
 
 def append_last_line(file, line):
     with open(file, 'a', encoding="utf-8") as f:
         # 加\n换行显示
         f.write("\n" + line)
+
+
+def get_url(file):
+    with open(file, 'r', encoding="utf-8") as f:
+        token = f.readline().strip('\n')
+    return wx_url + token
 
 
 def pop_line_from(file, del_line=1):  # del_line 行号从1开始
@@ -69,23 +76,23 @@ def sleep_time(hour, m, sec):
 def send_msg(content):
     """@全部，并发送指定信息"""
     data = json.dumps({
-                           "msgtype": "text",
-                           "text": {
-                               "content": content,
-                               "mentioned_list":
-                                   ["@all"]
-                           }
-                       })
-    r = requests.post(wx_url, data, auth=('Content-Type', 'application/json'))
+        "msgtype": "text",
+        "text": {
+            "content": content,
+            "mentioned_list":
+                ["@all"]
+        }
+    })
+    r = requests.post(get_url(wx_robot_token), data, auth=('Content-Type', 'application/json'))
     return r.status_code
 
 
-def every_time_send_msg(week_list=None, interval_h=0, interval_m=0, interval_s=31, special_h1="09", special_m="00"):
+def every_time_send_msg(week_list=None, interval_h=0, interval_m=0, interval_s=60, special_h1="15", special_m="48"):
     """每天指定时间发送指定消息"""
     print("任务启动...")
     # 设置自动执行间隔时间
     if week_list is None:
-        week_list = [0]
+        week_list = [1]
     second = sleep_time(interval_h, interval_m, interval_s)
     # 循环
     while True:
@@ -108,4 +115,3 @@ def every_time_send_msg(week_list=None, interval_h=0, interval_m=0, interval_s=3
 
 if __name__ == '__main__':
     every_time_send_msg()
-
