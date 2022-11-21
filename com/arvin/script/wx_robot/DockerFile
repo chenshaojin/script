@@ -5,4 +5,5 @@ COPY ./wx_exporter.py /wx_exporter.py
 COPY ./conf/wx_user conf/wx_user
 COPY ./conf/token conf/token
 COPY ./docker-entrypoint.sh /docker-entrypoint.sh
-ENTRYPOINT ["./docker-entrypoint.sh"]
+# ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD ["python", "wx_exporter.py"]
