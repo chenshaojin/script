@@ -9,6 +9,7 @@ Info: 定期向企业微信推送消息
 import datetime
 import http
 import json
+import sys
 import time
 
 import requests
@@ -29,6 +30,12 @@ def get_url(file):
     with open(file, 'r', encoding="utf-8") as f:
         token = f.readline().strip('\n')
     return wx_url + token
+
+
+def get_first_line(file):
+    with open(file, 'r', encoding="utf-8") as f:
+        first = f.readline().strip('\n')
+    return first
 
 
 def pop_line_from(file, del_line=1):  # del_line 行号从1开始
@@ -87,31 +94,46 @@ def send_msg(content):
     return r.status_code
 
 
-def every_time_send_msg(week_list=None, interval_h=0, interval_m=0, interval_s=60, special_h1="15", special_m="48"):
+def every_time_send_msg(week_list=None, special_h1="09", special_m="00"):
     """每天指定时间发送指定消息"""
-    print("任务启动...")
-    # 设置自动执行间隔时间
     if week_list is None:
-        week_list = [1]
-    second = sleep_time(interval_h, interval_m, interval_s)
-    # 循环
+        week_list = [1, 2, 3, 4, 5, 6, 7]
+    print("配置信息：每周" + str(week_list) + ", " + special_h1 + "时" + special_m + "分" + "发送提醒消息...")
+    print("任务启动...")
+    w_list = week_list
+    # 设置自动执行间隔时间
     while True:
-        # 获取当前时间和当前时分秒
         c_now, c_w, c_h, c_m, c_s = get_current_time()
-        if week_list.count(c_w) and c_h == special_h1 and c_m == special_m:
-            # 更新值班列表
-            print(c_now, "获取本次值班人信息...")
-            head = pop_line_from(wx_info_path)
-            print(c_now, "更新值班表信息...")
-            append_last_line(wx_info_path, head)
-            print(c_now, '正在发送企业微信提醒...')
-            code = send_msg("数据平台本周值班人: \n    " + head)
-            if code == http.HTTPStatus.OK:
-                print(c_now, '发送成功...')
-            print("每周" + str(week_list) + ", " + special_h1 + "时" + special_m + "分" + "发送提醒消息...")
-        # 延时周期
-        time.sleep(second)
+        # 每天定时
+        if w_list.count(c_w):
+            if c_h > special_h1:
+                rest = int(special_h1) - int(c_h) + 24
+                sleep_t = (rest - 1) * 3600 + (60 - int(c_m)) * 60
+                time.sleep(sleep_t)
+            elif c_h < special_h1:
+                rest = int(special_h1) - int(c_h)
+                sleep_t = (rest - 1) * 3600 + (60 - int(c_m)) * 60
+                time.sleep(sleep_t)
+            elif c_h == special_h1:
+                if c_w == "1":
+                    print(c_now, "更新值班表信息...")
+                    head = pop_line_from(wx_info_path)
+                    append_last_line(wx_info_path, head)
+
+                print(c_now, "获取本次值班人信息...")
+                first = get_first_line(wx_info_path)
+                print(c_now, '正在发送企业微信提醒...')
+                code = send_msg("数据平台本周值班人: \n    " + first)
+                if code == http.HTTPStatus.OK:
+                    print(c_now, '发送成功...')
+                time.sleep(86400 - int(c_m) * 60)
+        else:
+            rest = 24 - int(c_h)
+            sleep_t = (rest - 1) * 3600 + (60 - int(c_m)) * 60
+            time.sleep(sleep_t)
 
 
 if __name__ == '__main__':
-    every_time_send_msg()
+    week_l = sys.argv[1].split(",")
+    special_hour = sys.argv[2]
+    every_time_send_msg(week_l, special_hour)
