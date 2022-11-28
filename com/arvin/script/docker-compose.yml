@@ -3,13 +3,11 @@ services:
     build:
       context: ./wx_robot
       dockerfile: DockerFile
-      args:
-        - week="1,2,3,4,5,6,7"
-        - hour=09
     image: "chenshaojin/wx_robot:v1"
     restart: always
     environment: #设置东八时区上海时间
       - SET_CONTAINER_TIMEZONE=true
       - CONTAINER_TIMEZONE=Asia/Shanghai
+    command: ["1,2,3,4,5,6,7", 09]
     volumes:
       - "/xx/xx/xxx:/conf"

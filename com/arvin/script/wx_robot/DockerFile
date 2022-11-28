@@ -1,6 +1,4 @@
 FROM python:alpine3.16
-ARG week
-ARG hour
 
 RUN  pip install requests && \
      mkdir /conf
@@ -9,4 +7,3 @@ COPY ./conf/wx_user conf/wx_user
 COPY ./conf/token conf/token
 COPY ./docker-entrypoint.sh /docker-entrypoint.sh
 ENTRYPOINT ["python", "-u", "/wx_exporter.py"]
-CMD["$week", "$hour"]
