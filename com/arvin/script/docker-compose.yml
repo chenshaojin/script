@@ -2,5 +2,8 @@ services:
   yarn_metrics:
     image: "chenshaojin/wx_robot:v1"
     restart: always
+    environment: #设置东八时区上海时间
+      - SET_CONTAINER_TIMEZONE=true
+      - CONTAINER_TIMEZONE=Asia/Shanghai
     volumes:
       - "/xx/xx/xxx:/conf"
