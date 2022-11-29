@@ -68,7 +68,7 @@ def get_current_time():
     """获取当前时间，当前时分秒"""
     now = datetime.datetime.now()
     now_time = now.strftime('%Y-%m-%d %H:%M:%S')
-    week = now.isoweekday()
+    week = str(now.isoweekday())
     hour = now.strftime("%H")
     mm = now.strftime("%M")
     ss = now.strftime("%S")
@@ -97,7 +97,7 @@ def send_msg(content):
 def every_time_send_msg(week_list=None, special_h1="09", special_m="00"):
     """每天指定时间发送指定消息"""
     if week_list is None:
-        week_list = [1, 2, 3, 4, 5, 6, 7]
+        week_list = ["1", "2", "3", "4", "5", "6", "7"]
     print("配置信息：每周" + str(week_list) + ", " + special_h1 + "时" + special_m + "分" + "发送提醒消息...")
     print("任务启动...")
     w_list = week_list
